@@ -12,6 +12,14 @@ app = Flask(__name__)
 def getFunc():
     return render_template('index.html')
 
+@app.route('/AddName')
+def addName():
+    myFamily=get("https://myfamilytree.free.beeceptor.com")
+    Name=request.args.get('adnam')
+    dob = request.args.get('addob')
+    place=request.args('adplace')
+    MangoDb_Sample.InsertNewRecord(Name,dob,place)
+    return render_template('ListName.html',arg1=MangoDb_Sample.ListName())
 
 if __name__ == "__main__":
     app.run(debug=True)
