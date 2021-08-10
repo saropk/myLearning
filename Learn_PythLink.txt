@@ -1,0 +1,9 @@
+https://www.learnpython.org/en/Variables_and_Types
+
+https://morioh.com/p/9451f1260fe2
+
+python.exe -m pip install --upgrade pip
+pip install pymongo
+
+To create Virtual Environment:
+python -m venv learn-env
