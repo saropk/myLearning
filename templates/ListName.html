@@ -3,12 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>List Name details</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+function EditRow(id)
+{
+document.getElementById('Name'+id).readOnly=false;
+alert('success:' + 'Name'+id);
+client.get("https://myfamilytree.free.beeceptor.com")
+}
+
+function SaveRows(id)
+{
+
+document.getElementById('Name'+id).readOnly=true;
+inpName=document.getElementById('Name'+id).value;
+inpCity=document.getElementById('city'+id).value;
+inpDOB=document.getElementById('dob'+id).value;
+inpPlace=document.getElementById('place'+id).value;
+alert(inpName);
+//$"#Name1".val(inpName);
+//alert(inpName);
+//alert($"#Name1".val());
+$.post('http://127.0.0.1:5000/NameSave/Saro').done(function(data){alert(data)});
+alert('success:' + 'Name'+id);
+}
+</script>
 </head>
 <body>
-<table>
+<h1>Name List</h1>
+<input type="hidden" id="Name1">
+<input type="hidden" id="city1">
+<table border="2px solidblack">
     {% for outList in arg1%}
-    <tr><td>{{outList.Name}}</td></tr>
+    <tr>
+        <td><input type="text" value="{{outList.name}}" id="Name{{outList._id}}" readonly></td>
+        <td><input type="text" value="{{outList.city}}"  id="city{{outList._id}}"  readonly></td>
+        <td><input type="text" value="{{outList.dob}}"  id="dob{{outList._id}}"  readonly></td>
+        <td><input type="text" value="{{outList.place}}"  id="place{{outList._id}}"  readonly></td>
+        <td><input type="text" value="{{outList._id}}" id="{{outList._id}}" readonly></td>
+        <td><a href="#" onclick="EditRow('{{outList._id}}')">Edit</a>/<a href="#" onclick="SaveRows('{{outList._id}}')">Save</a> </td>
+    </tr>
     {% endfor %}
 </table>
+<h2><a href="http://127.0.0.1:5000/"> Go back to Home Page</> </h2>
 </body>
 </html>
