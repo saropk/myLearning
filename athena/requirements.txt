@@ -1,0 +1,11 @@
+# Core voice I/O
+SpeechRecognition>=3.10        # speech-to-text (cloud Google recogniser)
+PyAudio>=0.2.13                # microphone access (needs portaudio; see README)
+pyttsx3>=2.90                  # offline text-to-speech
+
+# Claude brain (open-ended questions). Optional: Athena runs rule-only without it.
+anthropic>=0.40
+
+# Optional skill helpers
+wikipedia>=1.4.0               # quick "who is / what is" lookups
+pywhatkit>=5.4                 # play the first YouTube result for "play <song>"
