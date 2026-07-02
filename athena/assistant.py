@@ -1,13 +1,17 @@
-"""Athena — the orchestrator that ties voice, brain and skills together.
+"""Athena — the orchestrator tying voice, brain and skills together.
 
-Two run modes:
-  * run_voice(): wake-word loop using the microphone (the real assistant).
-  * run_text():  keyboard loop, handy for testing without a mic or on a server.
+Run modes:
+  * run_voice(): wake word -> command -> a short conversation window for
+    follow-ups (no need to repeat the wake word) -> back to sleep.
+  * run_text():  keyboard loop for testing without a mic or on a server.
 """
 
+import re
+
 from .config import Config
-from .brain.router import Brain
+from .brain import build_brain
 from .skills import build_skills
+from .skills.smalltalk import EXIT_WORDS
 from .voice.speaker import Speaker
 
 
@@ -18,21 +22,8 @@ class Athena:
         self.running = True
 
         self.speaker = Speaker(self.config.voice_name, self.config.speech_rate)
-        self.brain = Brain(build_skills(), llm=self._build_llm())
+        self.brain = build_brain(self.config, build_skills())
         self._listener = None  # created lazily, only in voice mode
-
-    # ------------------------------------------------------------------ setup
-    def _build_llm(self):
-        """Attach the Claude brain if we have a key; otherwise stay rule-based."""
-        if not self.config.llm_available:
-            print("[athena] No ANTHROPIC_API_KEY — running with built-in skills only.")
-            return None
-        try:
-            from .brain.llm import LLM
-            return LLM(self.config.model)
-        except Exception as exc:
-            print(f"[athena] Could not start Claude brain: {exc}")
-            return None
 
     @property
     def listener(self):
@@ -50,9 +41,18 @@ class Athena:
         self.speaker.say(text)
 
     def handle(self, text: str) -> None:
-        """Route one command and speak the reply."""
-        reply = self.brain.respond(text, self)
-        self.speak(reply)
+        """Route one command and speak the reply. Exit words are handled here so
+        they work identically under either brain."""
+        if self._is_exit(text):
+            self.running = False
+            self.speak(f"Goodbye, {self.config.owner_name}. Call my name whenever you need me.")
+            return
+        self.speak(self.brain.respond(text, self))
+
+    @staticmethod
+    def _is_exit(text: str) -> bool:
+        lowered = (text or "").lower().strip()
+        return any(re.search(rf"\b{re.escape(w)}\b", lowered) for w in EXIT_WORDS)
 
     # ------------------------------------------------------------ run: text
     def run_text(self) -> None:
@@ -63,27 +63,30 @@ class Athena:
             except (EOFError, KeyboardInterrupt):
                 print()
                 break
-            if not text:
-                continue
-            self.handle(text)
+            if text:
+                self.handle(text)
 
     # ----------------------------------------------------------- run: voice
     def run_voice(self) -> None:
         wake = self.config.wake_word.capitalize()
-        self.speak(
-            f"{self.config.assistant_name} online. Say '{wake}' followed by a command."
-        )
+        self.speak(f"{self.config.assistant_name} online. Say '{wake}' to wake me.")
         while self.running:
             try:
-                # Anything said right after the wake word counts as the command.
                 trailing = self.listener.wait_for_wake_word()
-                command = trailing or self._prompt_for_command()
-                if command:
+                command = trailing or self._ask()
+                # Conversation window: keep taking follow-ups until the user
+                # goes quiet, then drop back to waiting for the wake word.
+                while self.running and command:
                     self.handle(command)
+                    if not self.running:
+                        break
+                    command = self.listener.listen_command(
+                        timeout=self.config.follow_up_timeout
+                    )
             except KeyboardInterrupt:
                 self.speak("Shutting down. Goodbye.")
                 break
 
-    def _prompt_for_command(self) -> str:
+    def _ask(self) -> str:
         self.speak("Yes?")
         return self.listener.listen_command()

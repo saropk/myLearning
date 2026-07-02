@@ -5,4 +5,4 @@ understands spoken commands, and either handles them with fast built-in skills
 or falls back to Claude for open-ended questions.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

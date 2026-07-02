@@ -1,6 +1,8 @@
-"""Greetings, identity, jokes and goodbye.
+"""Greetings, identity, jokes, thanks — the offline social layer.
 
-The goodbye branch flips athena.running to False so the main loop exits cleanly.
+Hidden from Claude (expose=False): when the Claude brain is active it handles
+chit-chat natively. This skill exists for the offline keyword brain. Exit words
+are exported for the assistant, which handles shutdown centrally.
 """
 
 import random
@@ -16,56 +18,62 @@ JOKES = [
     "There are 10 kinds of people: those who understand binary and those who don't.",
 ]
 
-EXIT_WORDS = ("goodbye", "bye", "exit", "quit", "shut down", "shutdown", "stop listening", "power off")
-GREETINGS = ("hello", "hi ", "hey", "good morning", "good afternoon", "good evening", "greetings")
+EXIT_WORDS = (
+    "goodbye", "bye", "exit", "quit", "shut down", "shutdown",
+    "stop listening", "power off", "go to sleep",
+)
+GREETINGS = ("hello", "hi", "hey", "good morning", "good afternoon",
+             "good evening", "greetings", "yo ")
 
 
 class SmallTalkSkill(Skill):
     name = "smalltalk"
-    triggers = EXIT_WORDS + GREETINGS + (
+    triggers = GREETINGS + (
         "how are you", "who are you", "your name", "what can you do",
-        "thank you", "thanks", "tell me a joke", "joke",
+        "thank you", "thanks", "joke",
     )
 
     def can_handle(self, text: str) -> bool:
         text = text.lower().strip()
-        if text in ("hi", "hey", "hello"):
+        if text in ("hi", "hey", "hello", "yo"):
             return True
         return super().can_handle(text)
 
-    def handle(self, text: str, athena) -> str | None:
-        text = text.lower().strip()
+    def run(self, athena, **params) -> str | None:
+        # The keyword brain passes the raw text through parse(); recover it here.
+        text = params.get("_text", "").lower().strip()
         cfg = athena.config
-
-        if any(word in text for word in EXIT_WORDS):
-            athena.running = False
-            return f"Goodbye, {cfg.owner_name}. Call my name whenever you need me."
-
-        if any(g in f" {text} " for g in GREETINGS) or text in ("hi", "hey", "hello"):
-            return f"{self._time_greeting()}, {cfg.owner_name}. How can I help?"
 
         if "how are you" in text:
             return "Sharp and ready. What's the strategy today?"
-
         if "who are you" in text or "your name" in text:
             return (
                 f"I'm {cfg.assistant_name}, your assistant — named for the Greek "
                 "goddess of wisdom, war and strategy."
             )
-
         if "what can you do" in text:
             return (
-                "I can tell the time, open apps and websites, play music, look "
-                "things up, and answer open-ended questions. Just ask."
+                "I can tell time, check the weather and news, set timers, do math, "
+                "open apps and sites, play music, remember things, and answer "
+                "questions. Just ask."
             )
-
         if "thank" in text:
             return "Anytime."
-
         if "joke" in text:
             return random.choice(JOKES)
-
+        if self._is_greeting(text):
+            return f"{self._time_greeting()}, {cfg.owner_name}. How can I help?"
         return None
+
+    def parse(self, text: str) -> dict | None:
+        if self.can_handle(text):
+            return {"_text": text}
+        return None
+
+    def _is_greeting(self, text: str) -> bool:
+        return text in ("hi", "hey", "hello", "yo") or any(
+            g in f" {text} " for g in GREETINGS
+        )
 
     @staticmethod
     def _time_greeting() -> str:

@@ -29,6 +29,8 @@ class Config:
     # Listening (speech-to-text) — cloud Google recogniser via SpeechRecognition.
     energy_threshold: int = int(os.getenv("ATHENA_ENERGY_THRESHOLD", "300"))
     pause_threshold: float = float(os.getenv("ATHENA_PAUSE_THRESHOLD", "0.8"))
+    # Seconds to keep listening for a follow-up before needing the wake word again.
+    follow_up_timeout: int = int(os.getenv("ATHENA_FOLLOW_UP_TIMEOUT", "7"))
 
     # Brain — the Claude model used for open-ended questions.
     # Only used when ANTHROPIC_API_KEY is set; otherwise Athena stays rule-based.
