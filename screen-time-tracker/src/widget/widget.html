@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="widget.css" />
+  <title>Iris widget</title>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="topbar">
+      <div class="brand"><span class="pupil"></span> Iris</div>
+      <div class="topbtns">
+        <button id="hideBtn" title="Hide widget (reopen from tray)">–</button>
+      </div>
+    </div>
+
+    <div class="row main">
+      <div class="stat">
+        <div class="label">Screen time today</div>
+        <div class="value" id="totalTime">0m</div>
+      </div>
+      <div class="stat right">
+        <div class="label">Now using</div>
+        <div class="value small" id="currentApp">—</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="stat">
+        <div class="label">Next eye break <span id="eyeState"></span></div>
+        <div class="value small" id="breakIn">20:00</div>
+      </div>
+      <div class="stat right">
+        <div class="label">Top app</div>
+        <div class="value small" id="topApp">—</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="trackToggle" class="toggle on">
+        <span class="dot"></span><span id="trackLabel">Tracking</span>
+      </button>
+      <button id="eyeToggle" class="toggle on" title="20-20-20 eye break reminders">👁 breaks</button>
+      <button id="reportBtn" class="primary">3D Report</button>
+    </div>
+
+    <div class="breakflash" id="breakflash">Look ~20 ft away · 20 s 👀</div>
+  </div>
+
+  <script src="widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iris — Screen Time Report</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="css/report.css" />
+</head>
+<body>
+  <!-- 3D canvas (fixed, scene is driven by scroll progress) -->
+  <canvas id="scene"></canvas>
+
+  <!-- scroll length driver -->
+  <div id="scroll-space"></div>
+
+  <!-- floating app-time bubbles (positions projected from 3D each frame) -->
+  <div id="bubbles"></div>
+
+  <!-- fixed overlay copy, faded per scroll section -->
+  <div id="overlay">
+    <header class="nav">
+      <div class="logo"><span class="logo-eye"></span> IRIS</div>
+      <div class="nav-date" id="reportDate"></div>
+    </header>
+
+    <section class="panel side" data-from="0.00" data-to="0.16">
+      <h1>Your day,<br/>through your own eye.</h1>
+      <p class="sub">Scroll to travel from the eye that watched the screen,<br/>
+        down the optic nerve where the hours flow,<br/>into the brain that decides what to do about it.</p>
+      <div class="hero-stats">
+        <div><b id="statTotal">–</b><span>screen time</span></div>
+        <div><b id="statTop">–</b><span>top app</span></div>
+        <div><b id="statIdle">–</b><span>idle</span></div>
+      </div>
+      <div class="scroll-hint">scroll<span class="chev">⌄</span></div>
+    </section>
+
+    <section class="panel side" data-from="0.20" data-to="0.34">
+      <h2>Into the pupil</h2>
+      <p class="sub">Every hour you spent today entered here — an hourglass,
+        draining through an icy iris. Keep going: the nerve carries the signal.</p>
+    </section>
+
+    <section class="panel side" data-from="0.36" data-to="0.62">
+      <h2>The optic nerve</h2>
+      <p class="sub">Each synapse below is an application — sized by the time it took from you.</p>
+    </section>
+
+    <section class="panel" data-from="0.66" data-to="0.80">
+      <h2>The brain weighs in</h2>
+      <p class="sub">What today's signal means — and how to spend tomorrow better.</p>
+    </section>
+
+    <section class="panel wide" data-from="0.80" data-to="1.00">
+      <div id="suggestions" class="cards"></div>
+      <div class="history">
+        <div class="history-title">Last 7 days</div>
+        <div id="historyBars" class="history-bars"></div>
+      </div>
+      <footer>Iris keeps every byte of this on your machine. Blink often. 👁</footer>
+    </section>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
