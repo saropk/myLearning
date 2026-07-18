@@ -54,10 +54,10 @@ export default function Eye({ strain = 0.2 }) {
       <group ref={drift}>
         {/* Sclera — polar cap cut out of the front so the iris shows.
             Poles face ±Z after the rotation; the front hole radius
-            (sin 0.56 ≈ 0.53) matches the iris disc. */}
+            (sin 0.645 ≈ 0.60) matches the iris disc. */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <sphereGeometry
-            args={[1, 64, 64, 0, Math.PI * 2, 0.56, Math.PI - 0.56]}
+            args={[1, 64, 64, 0, Math.PI * 2, 0.645, Math.PI - 0.645]}
           />
           <shaderMaterial
             vertexShader={scleraVertex}
@@ -67,9 +67,10 @@ export default function Eye({ strain = 0.2 }) {
           />
         </mesh>
 
-        {/* Iris — a disc set into the front of the globe */}
-        <mesh position={[0, 0, 0.86]}>
-          <circleGeometry args={[0.52, 96]} />
+        {/* Iris — large (ref: the iris dominates the fissure; the upper
+            lid crosses its top edge) */}
+        <mesh position={[0, 0, 0.8]}>
+          <circleGeometry args={[0.6, 96]} />
           <shaderMaterial
             vertexShader={irisVertex}
             fragmentShader={irisFragment}
@@ -78,17 +79,19 @@ export default function Eye({ strain = 0.2 }) {
         </mesh>
 
         {/* Clock pupil, floating just in front of the iris */}
-        <ClockPupil position={[0, 0, 0.875]} uniforms={irisUniforms} />
+        <ClockPupil position={[0, 0, 0.815]} uniforms={irisUniforms} />
 
-        {/* Cornea — refractive shell over the front; the wet highlight */}
-        <mesh position={[0, 0, 0.08]} scale={[1, 1, 1.06]}>
-          <sphereGeometry args={[0.98, 64, 64, 0, Math.PI * 2, 0, Math.PI]} />
+        {/* Cornea — a small refractive dome over the iris only (a shell
+            wrapping the whole front leaks refracted iris light past the
+            lids); carries the wet highlight */}
+        <mesh rotation={[Math.PI / 2, 0, 0]} scale={[1, 1.045, 1]}>
+          <sphereGeometry args={[0.99, 48, 32, 0, Math.PI * 2, 0, 0.72]} />
           <meshPhysicalMaterial
             transparent
-            opacity={0.22}
+            opacity={0.18}
             roughness={0.02}
-            transmission={0.9}
-            thickness={0.4}
+            transmission={0.85}
+            thickness={0.3}
             ior={1.376}
             clearcoat={1}
             clearcoatRoughness={0.04}

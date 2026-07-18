@@ -49,8 +49,16 @@ export const scleraFragment = /* glsl */ `
     // Museum lighting approximation: one cool key + blue rim.
     float lam = max(dot(n, normalize(vec3(0.45, 0.32, 0.83))), 0.0);
     float rim = pow(1.0 - max(n.z, 0.0), 2.6);
-    vec3 col = vec3(0.93, 0.91, 0.89) * (0.28 + 0.78 * lam)
-             + vec3(0.35, 0.5, 0.9) * rim * 0.16;
+    vec3 col = vec3(0.90, 0.87, 0.84) * (0.26 + 0.74 * lam)
+             + vec3(0.35, 0.5, 0.9) * rim * 0.14;
+
+    // The upper lid casts a soft shadow onto the globe, and the corners
+    // fall off into shadow — a sclera that is evenly white everywhere is
+    // a big part of what reads as fake. (Object space: world-up = -z,
+    // world-x = x after the mesh's +90° X rotation.)
+    float up = clamp(-vDir.z, 0.0, 1.0);
+    col *= 1.0 - smoothstep(0.05, 0.7, up) * 0.5;
+    col *= 1.0 - smoothstep(0.55, 0.95, abs(vDir.x)) * 0.4;
 
     // --- veins. front = 1 on the iris axis, 0 at the equator.
     // The mesh is rotated +90° about X so the geometry pole faces the

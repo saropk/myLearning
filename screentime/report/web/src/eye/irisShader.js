@@ -53,31 +53,38 @@ export const irisFragment = /* glsl */ `
     if (r > 1.0) discard;
 
     // --- stromal fibres: streaks aligned radially, jittered in angle.
-    float fibre = fbm(vec2(theta * 14.0, r * 5.5 - uTime * 0.015));
-    float fibreFine = fbm(vec2(theta * 42.0 + 7.3, r * 11.0));
-    float strands = smoothstep(0.25, 0.85, fibre * 0.65 + fibreFine * 0.45);
+    // High contrast: bright luminous filaments over a near-black field.
+    float fibre = fbm(vec2(theta * 16.0, r * 5.5 - uTime * 0.015));
+    float fibreFine = fbm(vec2(theta * 48.0 + 7.3, r * 12.0));
+    float strands = smoothstep(0.30, 0.88, fibre * 0.62 + fibreFine * 0.5);
 
     // --- radial zones
-    float pupilEdge = smoothstep(uPupil, uPupil + 0.035, r);          // hole
-    float collarette = 1.0 - smoothstep(0.0, 0.16, abs(r - (uPupil + 0.13)));
-    float limbal = smoothstep(0.78, 1.0, r);                           // dark rim
+    float pupilEdge = smoothstep(uPupil, uPupil + 0.03, r);           // hole
+    float collarette = 1.0 - smoothstep(0.0, 0.14, abs(r - (uPupil + 0.11)));
+    float limbal = smoothstep(0.60, 0.98, r);        // wide, nearly black rim
 
-    // --- icy palette
-    vec3 deep = vec3(0.043, 0.102, 0.223);
-    vec3 mid  = vec3(0.180, 0.373, 0.640);
-    vec3 ice  = vec3(0.560, 0.780, 0.980);
+    // --- deep cobalt palette: electric blue glowing out of darkness
+    vec3 deep = vec3(0.006, 0.028, 0.10);
+    vec3 mid  = vec3(0.030, 0.16, 0.52);
+    vec3 glow = vec3(0.16, 0.62, 1.0);
+    vec3 hot  = vec3(0.55, 0.85, 1.0);
 
     vec3 col = mix(deep, mid, strands);
-    col = mix(col, ice, collarette * 0.55 * (0.4 + 0.6 * strands));
-    col += ice * pow(1.0 - r, 2.0) * 0.10;          // inner glow
-    col = mix(col, deep * 0.35, limbal);             // limbal ring
+    col += glow * pow(strands, 2.2) * 0.85;                 // fibre luminance
+    col = mix(col, hot, collarette * 0.45 * (0.3 + 0.7 * strands));
+    col += glow * smoothstep(uPupil + 0.16, uPupil + 0.01, r) * 0.35; // pupil-edge halo
+    col = mix(col, vec3(0.002, 0.006, 0.02), limbal);       // fade to black edge
 
     // faint animated shimmer, like moisture catching light
-    col += ice * 0.05 * noise(vec2(theta * 6.0, uTime * 0.12));
+    col += glow * 0.04 * noise(vec2(theta * 6.0, uTime * 0.12));
 
     // fresnel-ish lift toward grazing view angles
     float grazing = 1.0 - abs(vViewDir.z);
-    col += ice * grazing * 0.08;
+    col += glow * grazing * 0.06;
+
+    // shadow of the upper lid falling across the top of the iris
+    float lidShadow = smoothstep(0.30, 0.85, (vUv.y - 0.5) * 2.0);
+    col *= 1.0 - lidShadow * 0.5;
 
     // carve the pupil
     col *= pupilEdge;

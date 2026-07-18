@@ -215,9 +215,16 @@ porcelain, thinking in slow constellations of cold light."
 ### Addendum — Act I refinements (settled)
 
 - **Full almond eye**: upper/lower lids with the fish-curve fissure and lashes, floating
-  in space with no face — near-black lid shells dissolve into the starfield. The globe
-  drifts behind stationary lids; blinks are real lid geometry. The lids part wider as
-  the camera pushes in — the eye opens to let you through.
+  in space with no face — unlit void-black lid shells vanish into the starfield, so the
+  fissure and lashes silhouette against the glowing eye. Real anatomy per reference:
+  asymmetric arcs (upper peak toward the inner third, lower flatter), the upper lid
+  crossing the top of the iris, a caruncle at the rounded inner corner, a flicked outer
+  corner, long curved clustered lashes, lid shadow falling on globe and iris, shadowed
+  sclera corners. The globe drifts behind stationary lids; blinks are real lid geometry.
+  The lids part wider as the camera pushes in — the eye opens to let you through.
+- **Iris colour (locked to reference)**: deep luminous cobalt — bright cyan-blue stromal
+  fibres glowing out of a near-black blue field, wide dark limbal ring fading to black,
+  soft halo at the pupil edge. Self-luminous quality; the iris is the light source.
 - **Strain reddening**: bloodshot veins creep from the sclera's periphery toward the
   iris, driven by an eye-strain score (0..1) computed from the day's data — marathons,
   skipped breaks, late-night use, heavy totals (mirrors the suggestion engine's rules).
