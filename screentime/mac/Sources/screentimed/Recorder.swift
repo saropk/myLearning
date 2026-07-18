@@ -1,4 +1,5 @@
 import Foundation
+import ScreenTimeCore
 
 /// Turns the poll stream into sessions rows. A session is an unbroken run of
 /// the same (app, active-vs-idle) state. The open session's end_ts is kept

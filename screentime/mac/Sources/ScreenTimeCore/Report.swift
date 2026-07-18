@@ -1,54 +1,54 @@
 import Foundation
 
 /// The JSON contract consumed by the report site (2D first, 3D later).
-struct DayReport: Codable {
-    struct Totals: Codable {
-        var activeSeconds: Int64
-        var idleSeconds: Int64
+public struct DayReport: Codable {
+    public struct Totals: Codable {
+        public var activeSeconds: Int64
+        public var idleSeconds: Int64
     }
-    struct AppEntry: Codable {
-        var bundleId: String
-        var appName: String
-        var category: String
-        var activeSeconds: Int64
-        var idleSeconds: Int64
+    public struct AppEntry: Codable {
+        public var bundleId: String
+        public var appName: String
+        public var category: String
+        public var activeSeconds: Int64
+        public var idleSeconds: Int64
     }
-    struct CategoryEntry: Codable {
-        var category: String
-        var activeSeconds: Int64
-        var idleSeconds: Int64
+    public struct CategoryEntry: Codable {
+        public var category: String
+        public var activeSeconds: Int64
+        public var idleSeconds: Int64
     }
-    struct LongestSession: Codable {
-        var bundleId: String
-        var appName: String
-        var startTs: Int64
-        var endTs: Int64
-        var seconds: Int64
+    public struct LongestSession: Codable {
+        public var bundleId: String
+        public var appName: String
+        public var startTs: Int64
+        public var endTs: Int64
+        public var seconds: Int64
     }
-    struct HourEntry: Codable {
-        var hour: Int
-        var activeSeconds: Int64
-        var idleSeconds: Int64
+    public struct HourEntry: Codable {
+        public var hour: Int
+        public var activeSeconds: Int64
+        public var idleSeconds: Int64
     }
-    struct Breaks: Codable {
-        var prompted: Int64
-        var taken: Int64
-        var skipped: Int64
-        var snoozed: Int64
+    public struct Breaks: Codable {
+        public var prompted: Int64
+        public var taken: Int64
+        public var skipped: Int64
+        public var snoozed: Int64
     }
 
-    var day: String
-    var generatedAt: String
-    var totals: Totals
-    var apps: [AppEntry]
-    var categories: [CategoryEntry]
-    var longestSession: LongestSession?
-    var hourly: [HourEntry]
-    var breaks: Breaks
+    public var day: String
+    public var generatedAt: String
+    public var totals: Totals
+    public var apps: [AppEntry]
+    public var categories: [CategoryEntry]
+    public var longestSession: LongestSession?
+    public var hourly: [HourEntry]
+    public var breaks: Breaks
 }
 
-enum Report {
-    static func build(db: Database, day: String) throws -> DayReport {
+public enum Report {
+    public static func build(db: Database, day: String) throws -> DayReport {
         var apps: [DayReport.AppEntry] = []
         try db.query("""
             SELECT bundle_id, app_name, category, active_seconds, idle_seconds
@@ -141,7 +141,7 @@ enum Report {
             breaks: breaks)
     }
 
-    static func json(db: Database, day: String) throws -> String {
+    public static func json(db: Database, day: String) throws -> String {
         let report = try build(db: db, day: day)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -149,7 +149,7 @@ enum Report {
         return String(data: data, encoding: .utf8) ?? "{}"
     }
 
-    static func today() -> String {
+    public static func today() -> String {
         Rollup.dayFormatter.string(from: Date())
     }
 
@@ -161,7 +161,7 @@ enum Report {
         return (Int64(start.timeIntervalSince1970), Int64(end.timeIntervalSince1970))
     }
 
-    static func printStatus(db: Database, day: String) throws {
+    public static func printStatus(db: Database, day: String) throws {
         let report = try build(db: db, day: day)
         func fmt(_ s: Int64) -> String {
             String(format: "%dh %02dm", s / 3600, (s % 3600) / 60)

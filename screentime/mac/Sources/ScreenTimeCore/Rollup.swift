@@ -2,17 +2,17 @@ import Foundation
 
 /// Maintains daily_rollup: per-day, per-app totals split active/idle.
 /// Sessions that cross midnight are split across the days they touch.
-enum Rollup {
-    static let dayFormatter: DateFormatter = {
+public enum Rollup {
+    public static let dayFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
         f.timeZone = .current
         return f
     }()
 
-    static func add(db: Database, bundleID: String, appName: String,
-                    category: String, isIdle: Bool,
-                    start: Date, end: Date) throws {
+    public static func add(db: Database, bundleID: String, appName: String,
+                           category: String, isIdle: Bool,
+                           start: Date, end: Date) throws {
         for (day, seconds) in splitByDay(start: start, end: end) where seconds > 0 {
             try db.run("""
                 INSERT INTO daily_rollup
@@ -31,7 +31,7 @@ enum Rollup {
     }
 
     /// Rebuilds the whole rollup table from the sessions table.
-    static func rebuild(db: Database) throws {
+    public static func rebuild(db: Database) throws {
         try db.exec("DELETE FROM daily_rollup;")
         struct Sess {
             let bundleID: String, appName: String, category: String
@@ -55,7 +55,7 @@ enum Rollup {
         }
     }
 
-    static func splitByDay(start: Date, end: Date) -> [(day: String, seconds: Int64)] {
+    public static func splitByDay(start: Date, end: Date) -> [(day: String, seconds: Int64)] {
         guard end > start else { return [] }
         var result: [(String, Int64)] = []
         let calendar = Calendar.current

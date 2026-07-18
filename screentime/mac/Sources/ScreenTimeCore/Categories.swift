@@ -2,8 +2,8 @@ import Foundation
 
 /// App categorisation. Seed defaults are inserted into the categories table
 /// on first run so that all edits (CLI or future UI) live in one place.
-struct Categories {
-    static let fallback = "Uncategorised"
+public struct Categories {
+    public static let fallback = "Uncategorised"
 
     static let seed: [(bundleID: String, category: String)] = [
         // Work
@@ -42,7 +42,7 @@ struct Categories {
     private let db: Database
     private var cache: [String: String] = [:]
 
-    init(db: Database) throws {
+    public init(db: Database) throws {
         self.db = db
         try seedIfEmpty()
         try reload()
@@ -67,11 +67,11 @@ struct Categories {
         cache = map
     }
 
-    func category(for bundleID: String) -> String {
+    public func category(for bundleID: String) -> String {
         cache[bundleID] ?? Categories.fallback
     }
 
-    mutating func set(bundleID: String, appName: String?, category: String) throws {
+    public mutating func set(bundleID: String, appName: String?, category: String) throws {
         try db.run("""
             INSERT INTO categories (bundle_id, app_name, category)
             VALUES (?, ?, ?)
@@ -85,7 +85,7 @@ struct Categories {
         cache[bundleID] = category
     }
 
-    func list() throws -> [(bundleID: String, appName: String?, category: String)] {
+    public func list() throws -> [(bundleID: String, appName: String?, category: String)] {
         var rows: [(String, String?, String)] = []
         try db.query(
             "SELECT bundle_id, app_name, category FROM categories ORDER BY category, bundle_id"

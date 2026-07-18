@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import ScreenTimeCore
 
 let usage = """
 screentimed — screen-time tracker daemon (macOS)

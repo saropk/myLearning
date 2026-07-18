@@ -5,11 +5,11 @@ import SQLite3
 // before the buffer is deallocated.
 private let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
-enum DBError: Error, CustomStringConvertible {
+public enum DBError: Error, CustomStringConvertible {
     case openFailed(String)
     case execFailed(sql: String, message: String)
 
-    var description: String {
+    public var description: String {
         switch self {
         case .openFailed(let m): return "could not open database: \(m)"
         case .execFailed(let sql, let m): return "SQL failed (\(m)): \(sql)"
@@ -17,17 +17,17 @@ enum DBError: Error, CustomStringConvertible {
     }
 }
 
-enum SQLValue {
+public enum SQLValue {
     case int(Int64)
     case real(Double)
     case text(String)
     case null
 }
 
-final class Database {
+public final class Database {
     private var db: OpaquePointer?
 
-    init(path: String) throws {
+    public init(path: String) throws {
         let dir = (path as NSString).deletingLastPathComponent
         try FileManager.default.createDirectory(
             atPath: dir, withIntermediateDirectories: true)
@@ -41,7 +41,8 @@ final class Database {
         }
         db = handle
 
-        // WAL lets the report server read while the daemon writes.
+        // WAL lets the report server and the widget read while the daemon
+        // writes; busy_timeout covers the widget's occasional writes.
         try exec("PRAGMA journal_mode=WAL;")
         try exec("PRAGMA busy_timeout=5000;")
         try migrate()
@@ -95,7 +96,7 @@ final class Database {
         """)
     }
 
-    func exec(_ sql: String) throws {
+    public func exec(_ sql: String) throws {
         var errMsg: UnsafeMutablePointer<CChar>?
         guard sqlite3_exec(db, sql, nil, nil, &errMsg) == SQLITE_OK else {
             let message = errMsg.map { String(cString: $0) } ?? "unknown"
@@ -106,7 +107,7 @@ final class Database {
 
     /// Runs a statement with bindings; returns lastInsertRowID.
     @discardableResult
-    func run(_ sql: String, _ binds: [SQLValue] = []) throws -> Int64 {
+    public func run(_ sql: String, _ binds: [SQLValue] = []) throws -> Int64 {
         let stmt = try prepare(sql, binds)
         defer { sqlite3_finalize(stmt) }
         guard sqlite3_step(stmt) == SQLITE_DONE else {
@@ -116,8 +117,8 @@ final class Database {
     }
 
     /// Runs a query, invoking `row` for each result row.
-    func query(_ sql: String, _ binds: [SQLValue] = [],
-               row: (Row) throws -> Void) throws {
+    public func query(_ sql: String, _ binds: [SQLValue] = [],
+                      row: (Row) throws -> Void) throws {
         let stmt = try prepare(sql, binds)
         defer { sqlite3_finalize(stmt) }
         while true {
@@ -149,16 +150,16 @@ final class Database {
         return stmt
     }
 
-    struct Row {
+    public struct Row {
         let stmt: OpaquePointer
 
-        func int(_ i: Int32) -> Int64 { sqlite3_column_int64(stmt, i) }
-        func double(_ i: Int32) -> Double { sqlite3_column_double(stmt, i) }
-        func text(_ i: Int32) -> String {
+        public func int(_ i: Int32) -> Int64 { sqlite3_column_int64(stmt, i) }
+        public func double(_ i: Int32) -> Double { sqlite3_column_double(stmt, i) }
+        public func text(_ i: Int32) -> String {
             guard let c = sqlite3_column_text(stmt, i) else { return "" }
             return String(cString: c)
         }
-        func textOrNil(_ i: Int32) -> String? {
+        public func textOrNil(_ i: Int32) -> String? {
             guard sqlite3_column_type(stmt, i) != SQLITE_NULL else { return nil }
             return text(i)
         }

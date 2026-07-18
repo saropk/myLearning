@@ -1,16 +1,18 @@
 import Foundation
 
-struct Config {
+public struct Config {
     /// Seconds between frontmost-app samples.
-    var pollInterval: TimeInterval = 2.0
+    public var pollInterval: TimeInterval = 2.0
     /// Seconds of no input before the user counts as idle.
-    var idleThreshold: TimeInterval = 120.0
+    public var idleThreshold: TimeInterval = 120.0
     /// Window-title capture is off by default: titles are sensitive and
     /// capturing them requires the Accessibility permission.
-    var captureTitles = false
-    var dbPath: String = Config.defaultDBPath
+    public var captureTitles = false
+    public var dbPath: String = Config.defaultDBPath
 
-    static var defaultDBPath: String {
+    public init() {}
+
+    public static var defaultDBPath: String {
         let appSupport = FileManager.default.urls(
             for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return appSupport
@@ -18,7 +20,7 @@ struct Config {
     }
 
     /// Parses flags shared by all subcommands. Returns unconsumed arguments.
-    static func parse(_ args: [String]) throws -> (Config, [String]) {
+    public static func parse(_ args: [String]) throws -> (Config, [String]) {
         var config = Config()
         var rest: [String] = []
         var i = 0
@@ -55,8 +57,8 @@ struct Config {
     }
 }
 
-struct UsageError: Error, CustomStringConvertible {
-    let message: String
-    init(_ message: String) { self.message = message }
-    var description: String { message }
+public struct UsageError: Error, CustomStringConvertible {
+    public let message: String
+    public init(_ message: String) { self.message = message }
+    public var description: String { message }
 }
