@@ -13,13 +13,14 @@ Full specification (including the settled Act II/III aesthetic direction):
 |---|---|---|
 | `docs/` | project spec | — |
 | `tracker/` | Swift daemon + SQLite store (build step 1) | ✅ built |
-| `report/` | 2D report + local server (step 2), then 3D acts (steps 4–5) | ⬜ next |
-| `widget/` | menu bar app + 20-20-20 nudges (step 3) | ⬜ |
+| `report/` | 2D report + local server (step 2), then 3D acts (steps 4–5) | ✅ 2D built |
+| `widget/` | menu bar app + 20-20-20 nudges (step 3) | ⬜ next |
 
 ## Build order (from the spec)
 
 1. **Tracker daemon + local database** — done: see [`tracker/`](tracker/README.md).
-2. Plain 2D report — prove the data and insights are good.
+2. **Plain 2D report + local server + suggestions engine** — done: see
+   [`report/`](report/README.md).
 3. Menu bar widget + break nudges — where the wellbeing benefit lives.
 4. 3D report, Act I (the eye) only.
 5. Acts II (optic nerve) and III (brain).

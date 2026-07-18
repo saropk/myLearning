@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screen Time — Report</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Screen&nbsp;Time</h1>
+  <nav id="day-picker" aria-label="Choose day"></nav>
+</header>
+
+<main id="report" hidden>
+  <section id="headline">
+    <div class="stat">
+      <span class="stat-value" id="stat-active">–</span>
+      <span class="stat-label">active</span>
+    </div>
+    <div class="stat dim">
+      <span class="stat-value" id="stat-idle">–</span>
+      <span class="stat-label">idle (lid open, unused)</span>
+    </div>
+    <div class="stat dim">
+      <span class="stat-value" id="stat-longest">–</span>
+      <span class="stat-label" id="stat-longest-label">longest session</span>
+    </div>
+  </section>
+
+  <section id="suggestions-section" hidden>
+    <h2>What the day says</h2>
+    <ul id="suggestions"></ul>
+  </section>
+
+  <section>
+    <h2>Applications</h2>
+    <div id="apps"></div>
+  </section>
+
+  <section>
+    <h2>Categories</h2>
+    <div id="categories"></div>
+  </section>
+
+  <section>
+    <h2>Across the day</h2>
+    <div id="hourly"></div>
+    <div class="axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+  </section>
+
+  <section id="breaks-section" hidden>
+    <h2>Breaks</h2>
+    <p id="breaks"></p>
+  </section>
+</main>
+
+<p id="empty" hidden>No data for this day.</p>
+<p id="error" hidden></p>
+
+<script src="report.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+/* The plain-numbers view. Dark and icy like the eventual 3D report,
+   but deliberately calm — this page must never strain the eyes. */
+
+:root {
+  --bg: #05070d;
+  --panel: #0b1020;
+  --text: #d7e3f4;
+  --dim: #6c7a92;
+  --ice: #7fb8ff;
+  --ice-deep: #2f6fd0;
+  --magenta: #c86bd9;
+  --warn: #e0a34c;
+  --bar-track: #131a2c;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0 auto;
+  max-width: 860px;
+  padding: 2.5rem 1.25rem 5rem;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.55 ui-sans-serif, -apple-system, "Inter", "Segoe UI", sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+h1 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--ice);
+  margin: 0;
+}
+
+h2 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin: 2.5rem 0 1rem;
+}
+
+#day-picker { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+#day-picker button {
+  background: var(--panel);
+  color: var(--dim);
+  border: 1px solid #182138;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+#day-picker button.active {
+  color: var(--bg);
+  background: var(--ice);
+  border-color: var(--ice);
+}
+
+#headline { display: flex; gap: 3rem; flex-wrap: wrap; }
+.stat-value {
+  display: block;
+  font-size: 2.4rem;
+  font-weight: 200;
+  letter-spacing: 0.02em;
+  color: var(--ice);
+}
+.stat.dim .stat-value { color: var(--text); font-size: 1.6rem; padding-top: 0.55rem; }
+.stat-label { color: var(--dim); font-size: 0.8rem; }
+
+#suggestions { list-style: none; margin: 0; padding: 0; }
+#suggestions li {
+  background: var(--panel);
+  border-left: 3px solid var(--ice-deep);
+  border-radius: 0 8px 8px 0;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+}
+#suggestions li.high { border-left-color: var(--magenta); }
+#suggestions li.medium { border-left-color: var(--warn); }
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 11rem 1fr 5.5rem;
+  gap: 0.9rem;
+  align-items: center;
+  margin-bottom: 0.55rem;
+  font-size: 0.9rem;
+}
+.bar-row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-row .name small { color: var(--dim); margin-left: 0.45rem; }
+.bar-row .time { text-align: right; color: var(--dim); font-variant-numeric: tabular-nums; }
+
+.bar-track { display: block; background: var(--bar-track); border-radius: 4px; height: 10px; overflow: hidden; }
+.bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--ice-deep), var(--ice));
+}
+.bar-fill.cat-Work { background: linear-gradient(90deg, #2f6fd0, #7fb8ff); }
+.bar-fill.cat-Communication { background: linear-gradient(90deg, #3f8f7a, #7fe0c3); }
+.bar-fill.cat-Browsing { background: linear-gradient(90deg, #8f6fd0, #c8a9ff); }
+.bar-fill.cat-Entertainment { background: linear-gradient(90deg, #b05fa0, #e88fd0); }
+.bar-fill.cat-Uncategorised { background: linear-gradient(90deg, #4a5568, #8a97ad); }
+
+#hourly {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  align-items: end;
+  gap: 3px;
+  height: 110px;
+}
+#hourly .hour { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; gap: 1px; }
+#hourly .h-active { background: linear-gradient(180deg, var(--ice), var(--ice-deep)); border-radius: 2px 2px 0 0; }
+#hourly .h-idle { background: #26304a; border-radius: 2px; }
+.axis { display: flex; justify-content: space-between; color: var(--dim); font-size: 0.7rem; margin-top: 0.4rem; }
+
+#breaks { color: var(--dim); }
+#empty, #error { color: var(--dim); text-align: center; margin-top: 4rem; }
+#error { color: var(--warn); }
