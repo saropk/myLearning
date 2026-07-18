@@ -13,7 +13,7 @@ Full specification (including the settled Act II/III aesthetic direction):
 |---|---|---|
 | `docs/` | project spec | — |
 | `mac/` | Swift package: `screentimed` daemon + SQLite store (step 1), `screentimebar` menu bar widget + nudges (step 3) | ✅ built |
-| `report/` | 2D report + local server (step 2), then 3D acts (steps 4–5) | ✅ 2D built |
+| `report/` | 2D report + local server (step 2), 3D report (steps 4–5) | ✅ 2D + Act I built |
 
 ## Build order (from the spec)
 
@@ -22,8 +22,8 @@ Full specification (including the settled Act II/III aesthetic direction):
    [`report/`](report/README.md).
 3. **Menu bar widget + break nudges** — done: `screentimebar` in
    [`mac/`](mac/README.md).
-4. 3D report, Act I (the eye) only — next.
-5. Acts II (optic nerve) and III (brain).
+4. **3D report, Act I (the eye)** — done: see [`report/web/`](report/web/README.md).
+5. Acts II (optic nerve) and III (brain) — next.
 
 All data stays on the machine. The tracker runs with zero permission prompts
 in its default configuration.
