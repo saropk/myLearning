@@ -6,7 +6,7 @@ import Eye from "./eye/Eye.jsx";
 import Starfield from "./Starfield.jsx";
 import { TIERS } from "./quality.js";
 
-export default function Experience({ tier }) {
+export default function Experience({ tier, strain = 0.2 }) {
   const q = TIERS[tier] ?? TIERS.medium;
 
   return (
@@ -27,7 +27,7 @@ export default function Experience({ tier }) {
       <pointLight position={[-4, -1, -3]} intensity={9} color="#3f6fd8" />
 
       <Starfield count={q.stars} />
-      <Eye />
+      <Eye strain={strain} />
       <CameraRig />
 
       {q.bloom && (

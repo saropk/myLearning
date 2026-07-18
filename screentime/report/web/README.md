@@ -19,22 +19,33 @@ numbers" link points at it, and Acts II–III will pull `/api/report`.
 
 ## What's implemented
 
-- **The eye**: sclera with a polar-cap aperture, custom-GLSL iris
-  (radial stromal fibres, limbal ring, collarette, icy palette, animated
-  shimmer), refractive cornea shell with the wet specular, and the
-  **clock pupil** — ring + hands as real geometry, ticking at idle.
-- **Idle life**: slow drift, subtle pupil breathing, a screen-space blink
-  every ~8 s. The drift calms as scrolling begins.
-- **Push-in (scroll 0–30%)**: camera dollies from off-axis into the pupil;
-  FOV tightens; the pupil dilates and the hands sweep faster the closer
-  you get; a black veil resolves at ~27–31% — the scene-handoff moment
-  where Act II will take over.
-- **Starfield**: two parallax layers of GPU points, additive, twinkling.
+- **The full almond eye**: upper/lower lids with the fish-curve fissure
+  and instanced lashes, floating in space (near-black shells dissolve
+  into the starfield — no face). The globe (sclera + iris + cornea +
+  pupil) drifts behind stationary lids; blinks are real lid geometry,
+  and the lids part wider as the camera pushes in.
+- **The iris & cornea**: custom-GLSL iris (radial stromal fibres, limbal
+  ring, collarette, icy palette, animated shimmer), refractive cornea
+  shell with the wet specular.
+- **The clock pupil**: ring + hands as real geometry, ticking at idle;
+  hands accelerate through the push-in and smear into spinning additive
+  blur arcs at the through moment — the vortex.
+- **Strain reddening**: the sclera shader grows bloodshot veins from the
+  periphery toward the iris, driven by the eye-strain score
+  (`src/strain.js`) computed from `/api/report` — marathons, skipped
+  breaks, late-night use, heavy totals. `?strain=0.9` pins it for
+  look-dev.
+- **Push-in (scroll 0–30%)**: camera dollies from off-axis into the
+  pupil; FOV tightens; pupil dilates; a black veil resolves at ~27–31% —
+  the scene-handoff moment where Act II will take over.
+- **Starfield**: two parallax point layers plus a streak layer — lines
+  stretch radially as speed builds through the push-in (full hyperspace
+  is reserved for the warp).
 - **Quality tiers** (`src/quality.js`): star counts and DPR scaled to the
   GPU; bloom off on the low tier; `off` tier and `prefers-reduced-motion`
   render a static page linking to the plain-numbers report.
-- **Look-dev**: `?p=0.22` pins the timeline at any progress for
-  inspection/screenshots without scrolling.
+- **Look-dev**: `?p=0.22` pins the timeline, `?strain=0.9` pins the
+  redness — inspect any beat without scrolling or real data.
 
 ## Still to come (steps 5a/5b)
 

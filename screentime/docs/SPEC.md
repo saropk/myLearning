@@ -212,6 +212,22 @@ porcelain, thinking in slow constellations of cold light."
 - **Ruled out:** visible vasculature, red/pink tissue tones, glistening wet surfaces on
   nerve/brain, exposed cross-sections.
 
+### Addendum — Act I refinements (settled)
+
+- **Full almond eye**: upper/lower lids with the fish-curve fissure and lashes, floating
+  in space with no face — near-black lid shells dissolve into the starfield. The globe
+  drifts behind stationary lids; blinks are real lid geometry. The lids part wider as
+  the camera pushes in — the eye opens to let you through.
+- **Strain reddening**: bloodshot veins creep from the sclera's periphery toward the
+  iris, driven by an eye-strain score (0..1) computed from the day's data — marathons,
+  skipped breaks, late-night use, heavy totals (mirrors the suggestion engine's rules).
+  A well-paced day stays white. The eye itself is the first data visualization.
+- **Clock vortex**: hand acceleration continues past readability until hands, pin, and
+  all smear into spinning additive blur arcs at the through-the-pupil moment — time
+  dissolving as you enter it.
+- **Star streaks**: a line-segment layer stretches radially with speed — subtle
+  elongation building through the push-in, full hyperspace streaks reserved for the warp.
+
 ---
 
 ## 7. Suggested Build Order

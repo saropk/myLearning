@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Experience from "./Experience.jsx";
 import { detectTier, prefersReducedMotion } from "./quality.js";
 import { initScroll, scrollState } from "./scroll.js";
+import { computeStrain, loadReport } from "./strain.js";
 
 const PLAIN_URL = "http://127.0.0.1:5177/";
 
@@ -41,53 +42,6 @@ function BlackVeil() {
         THROUGH THE PUPIL — ACT II BEGINS HERE
       </p>
     </div>
-  );
-}
-
-// A slow blink every ~8s: soft-curved shutters sweep the frame for a beat.
-// Screen-space (the viewer blinks, not the eye) — simple and robust; can be
-// upgraded to geometry lids during Act I look-dev.
-function Blink() {
-  const shutter = {
-    position: "fixed",
-    left: "-10vw",
-    right: "-10vw",
-    height: "56vh",
-    background: "#020308",
-    zIndex: 2,
-    pointerEvents: "none",
-  };
-  return (
-    <>
-      <div
-        style={{
-          ...shutter,
-          top: 0,
-          transform: "translateY(-101%)",
-          animation: "blinkTop 8.2s ease-in-out infinite",
-          borderRadius: "0 0 50% 50% / 0 0 16vh 16vh",
-        }}
-      />
-      <div
-        style={{
-          ...shutter,
-          bottom: 0,
-          transform: "translateY(101%)",
-          animation: "blinkBottom 8.2s ease-in-out infinite",
-          borderRadius: "50% 50% 0 0 / 16vh 16vh 0 0",
-        }}
-      />
-      <style>{`
-        @keyframes blinkTop {
-          0%, 93.5%, 97%, 100% { transform: translateY(-101%); }
-          95% { transform: translateY(0); }
-        }
-        @keyframes blinkBottom {
-          0%, 93.5%, 97%, 100% { transform: translateY(101%); }
-          95% { transform: translateY(0); }
-        }
-      `}</style>
-    </>
   );
 }
 
@@ -186,7 +140,18 @@ function StaticFallback({ reason }) {
 
 export default function App() {
   const [tier] = useState(detectTier);
+  const [strain, setStrain] = useState(0.2);
   const reduced = prefersReducedMotion();
+
+  useEffect(() => {
+    // Look-dev: ?strain=0.9 pins the bloodshot level directly.
+    const override = new URLSearchParams(location.search).get("strain");
+    if (override !== null) {
+      setStrain(Math.min(1, Math.max(0, parseFloat(override) || 0)));
+      return;
+    }
+    loadReport().then((report) => setStrain(computeStrain(report)));
+  }, []);
 
   useEffect(() => {
     if (reduced || tier === "off") return undefined;
@@ -200,8 +165,7 @@ export default function App() {
     <>
       {/* Scroll runway: Act I owns 0–30% of it. Acts II–III extend this. */}
       <div style={{ height: "400vh" }} />
-      <Experience tier={tier} />
-      <Blink />
+      <Experience tier={tier} strain={strain} />
       <BlackVeil />
       <Hud />
     </>
