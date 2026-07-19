@@ -20,8 +20,8 @@ export default function ClockPupil({ position, uniforms }) {
     const p = scrollState.progress;
 
     // The ring tracks the pupil radius from the iris shader (disc space
-    // 0..1 maps to iris radius 0.60).
-    const pupilR = uniforms.uPupil.value * 0.6 * 2.0;
+    // 0..1 maps to iris radius 0.42).
+    const pupilR = uniforms.uPupil.value * 0.42 * 2.0;
     if (group.current) {
       group.current.scale.setScalar(pupilR / 0.17);
     }

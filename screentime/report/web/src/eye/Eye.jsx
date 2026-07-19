@@ -54,10 +54,10 @@ export default function Eye({ strain = 0.2 }) {
       <group ref={drift}>
         {/* Sclera — polar cap cut out of the front so the iris shows.
             Poles face ±Z after the rotation; the front hole radius
-            (sin 0.645 ≈ 0.60) matches the iris disc. */}
+            (sin 0.44 ≈ 0.43) matches the iris disc. */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <sphereGeometry
-            args={[1, 64, 64, 0, Math.PI * 2, 0.645, Math.PI - 0.645]}
+            args={[1, 64, 64, 0, Math.PI * 2, 0.44, Math.PI - 0.44]}
           />
           <shaderMaterial
             vertexShader={scleraVertex}
@@ -67,10 +67,10 @@ export default function Eye({ strain = 0.2 }) {
           />
         </mesh>
 
-        {/* Iris — large (ref: the iris dominates the fissure; the upper
-            lid crosses its top edge) */}
-        <mesh position={[0, 0, 0.8]}>
-          <circleGeometry args={[0.6, 96]} />
+        {/* Iris — human proportion: ~43% of the fissure width, sclera
+            clear on both sides, the upper lid grazing its top */}
+        <mesh position={[0, 0, 0.9]}>
+          <circleGeometry args={[0.42, 96]} />
           <shaderMaterial
             vertexShader={irisVertex}
             fragmentShader={irisFragment}
@@ -79,13 +79,13 @@ export default function Eye({ strain = 0.2 }) {
         </mesh>
 
         {/* Clock pupil, floating just in front of the iris */}
-        <ClockPupil position={[0, 0, 0.815]} uniforms={irisUniforms} />
+        <ClockPupil position={[0, 0, 0.912]} uniforms={irisUniforms} />
 
         {/* Cornea — a small refractive dome over the iris only (a shell
             wrapping the whole front leaks refracted iris light past the
             lids); carries the wet highlight */}
         <mesh rotation={[Math.PI / 2, 0, 0]} scale={[1, 1.045, 1]}>
-          <sphereGeometry args={[0.99, 48, 32, 0, Math.PI * 2, 0, 0.72]} />
+          <sphereGeometry args={[0.99, 48, 32, 0, Math.PI * 2, 0, 0.52]} />
           <meshPhysicalMaterial
             transparent
             opacity={0.18}

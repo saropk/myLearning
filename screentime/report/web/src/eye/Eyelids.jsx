@@ -12,26 +12,33 @@ import { scrollState } from "../scroll.js";
 const SEG_U = 56;
 const SEG_V = 16;
 const R = 1.05;
-const W = 0.94;
+const W = 0.97;
+// The whole fissure tilts: the outer corner sits higher than the inner
+// (measured off the reference painting).
+const CORNER_TILT = 0.07;
 
-function lashLineY(t, H, tilt, peakWarp) {
+function lashLineY(t, H, tilt, peakWarp, sign) {
   // Real lids are asymmetric: the upper arc peaks toward the inner third
-  // (peakWarp < 1 shifts the peak inward), the lower sits flatter with
-  // its peak toward the outer third (peakWarp > 1). Tilt (the outer-
-  // corner lift) is damped by the arc so both lash lines land on exactly
-  // the same corner points. t: 0 = inner corner, 1 = outer corner.
+  // (peakWarp < 1 shifts the peak inward), the lower sits much flatter
+  // with its weight toward the outer third (peakWarp > 1). Tilt is
+  // damped by the arc so both lash lines land on exactly the same
+  // corner points; CORNER_TILT raises the outer corner for the whole
+  // fissure. t: 0 = inner corner, 1 = outer corner. Returns world y.
   const arc = Math.sin(Math.PI * Math.pow(t, peakWarp));
-  return H * Math.pow(arc, 0.9) + tilt * (t - 0.5) * arc * 2;
+  return (
+    sign * (H * Math.pow(arc, 0.9) + tilt * (t - 0.5) * arc * 2) +
+    CORNER_TILT * (t - 0.5)
+  );
 }
 
 function lidParams(isUpper, open) {
   return {
-    // The upper aperture is deep enough that the lid still crosses the
-    // top of the iris (radius 0.60) — a full visible iris circle is
-    // what reads as cartoon.
-    H: (isUpper ? 0.56 : 0.36) * open + 0.015,
-    tilt: isUpper ? 0.06 : -0.02,
-    peakWarp: isUpper ? 0.82 : 1.22,
+    // Aperture sized so the iris (radius 0.42 — ~43% of fissure width,
+    // per the reference) sits with sclera clear on both sides, the
+    // upper lid grazing its top.
+    H: (isUpper ? 0.58 : 0.30) * open + 0.015,
+    tilt: isUpper ? 0.05 : -0.015,
+    peakWarp: isUpper ? 0.82 : 1.3,
     sign: isUpper ? 1 : -1,
     yFar: isUpper ? 0.99 : -0.97,
   };
@@ -45,7 +52,7 @@ function fillLid(pos, nor, isUpper, open) {
     for (let i = 0; i <= SEG_U; i++) {
       const t = i / SEG_U;
       const x = W * (2 * t - 1);
-      const yl = sign * lashLineY(t, H, tilt, peakWarp);
+      const yl = lashLineY(t, H, tilt, peakWarp, sign);
       const yEdge = Math.sqrt(Math.max(R * R * 0.985 - x * x, 0.0001)) * sign;
       const yTarget = isUpper ? Math.min(yFar, yEdge) : Math.max(yFar, yEdge);
       const y = yl + (yTarget - yl) * s;
@@ -75,6 +82,30 @@ function makeLidGeometry() {
     "normal",
     new THREE.BufferAttribute(new Float32Array(verts * 3), 3)
   );
+  // Margin gradient baked into vertex colors: a soft blue-grey ledge at
+  // the lash line (the lid's physical presence) falling to the exact
+  // background colour within ~30% of the lid span. Vertex colours on a
+  // basic material share the background's colour pipeline, so the far
+  // lid is genuinely indistinguishable from the void — no silhouette.
+  // Vertex colours are linear; the background hex goes through
+  // sRGB→linear conversion — convert ours the same way or "matching
+  // black" renders ~10× brighter than the background.
+  const margin = new THREE.Color(0.1, 0.11, 0.17).convertSRGBToLinear();
+  const voidCol = new THREE.Color(0.0078, 0.0118, 0.0314).convertSRGBToLinear();
+  const waterC = new THREE.Color(0.05, 0.06, 0.09).convertSRGBToLinear();
+  const colors = new Float32Array(verts * 3);
+  let k = 0;
+  for (let j = 0; j <= SEG_V; j++) {
+    const s = j / SEG_V;
+    const f = THREE.MathUtils.smoothstep(s, 0.01, 0.3);
+    const water = 1 - THREE.MathUtils.smoothstep(s, 0.0, 0.06);
+    for (let i = 0; i <= SEG_U; i++) {
+      colors[k++] = margin.r * (1 - f) + voidCol.r * f + waterC.r * water;
+      colors[k++] = margin.g * (1 - f) + voidCol.g * f + waterC.g * water;
+      colors[k++] = margin.b * (1 - f) + voidCol.b * f + waterC.b * water;
+    }
+  }
+  geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
   const index = [];
   for (let j = 0; j < SEG_V; j++) {
     for (let i = 0; i < SEG_U; i++) {
@@ -99,16 +130,16 @@ const UP = new THREE.Vector3(0, 1, 0);
 function fillLashes(mesh, isUpper, open, seeds) {
   const { H, tilt, peakWarp, sign } = lidParams(isUpper, open);
   const n = mesh.count;
-  // Long, swooping lashes (ref: they reach ~20% of the eye's width);
-  // lower lashes much shorter and sparser.
-  const baseLen = isUpper ? 0.21 : 0.09;
+  // Long, swooping lashes; lower lashes much shorter and sparser.
+  // Denser and finer than comb teeth — softness comes from count.
+  const baseLen = isUpper ? 0.17 : 0.08;
   for (let i = 0; i < n; i++) {
     const seed = seeds[i];
     // cluster jitter: lashes bunch rather than spacing like comb teeth
     const t =
       0.06 + (0.88 * i) / (n - 1) + (seed - 0.5) * 0.018;
     const x = W * (2 * t - 1);
-    const y = sign * lashLineY(t, H, tilt, peakWarp);
+    const y = lashLineY(t, H, tilt, peakWarp, sign);
     const z = Math.sqrt(Math.max(R * R - x * x - y * y, 0.0008)) + 0.012;
     _pos.set(x, y, z);
 
@@ -151,12 +182,12 @@ export default function Eyelids() {
       new THREE.Vector3(0, 0.62, 0.06),
       new THREE.Vector3(0, 0.98, 0.5)
     );
-    return new THREE.TubeGeometry(curve, 9, 0.0032, 5, false);
+    return new THREE.TubeGeometry(curve, 9, 0.0023, 5, false);
   }, []);
   const seeds = useMemo(() => {
     const rng = [];
     let s = 7;
-    for (let i = 0; i < 96; i++) {
+    for (let i = 0; i < 160; i++) {
       s = (s * 16807) % 2147483647;
       rng.push((s % 1000) / 1000);
     }
@@ -173,7 +204,7 @@ export default function Eyelids() {
     const push = THREE.MathUtils.smoothstep(p, 0.08, 0.28);
     const phase = (t % 8.2) / 8.2;
     const blink = Math.exp(-Math.pow((phase - 0.5) * 30, 2)) * calm;
-    const open = (0.8 + push * 0.6) * (1 - blink * 0.97);
+    const open = (0.74 + push * 0.66) * (1 - blink * 0.97);
 
     if (Math.abs(open - lastOpen.current) < 0.0004) return;
     lastOpen.current = open;
@@ -197,33 +228,36 @@ export default function Eyelids() {
     if (lowerLashes.current) fillLashes(lowerLashes.current, false, open, seeds);
   });
 
-  // Void-black lids, unlit: they receive no light at all, so the shells
-  // are indistinguishable from the background — the ball silhouette
-  // disappears and the fissure + lashes silhouette against the glowing
-  // eye, the mood of the iris reference.
-  const lidMaterial = (
-    <meshBasicMaterial color="#020308" side={THREE.DoubleSide} />
+  // Basic material + baked vertex colours (see makeLidGeometry): the
+  // margin ledge is visible, the far lid matches the background exactly.
+  const lidMaterial = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        vertexColors: true,
+        side: THREE.DoubleSide,
+      }),
+    []
   );
 
   return (
     <group>
-      <mesh ref={upper} geometry={upperGeo}>{lidMaterial}</mesh>
-      <mesh ref={lower} geometry={lowerGeo}>{lidMaterial}</mesh>
+      <mesh ref={upper} geometry={upperGeo} material={lidMaterial} />
+      <mesh ref={lower} geometry={lowerGeo} material={lidMaterial} />
       <instancedMesh
         ref={upperLashes}
-        args={[lashGeo, undefined, 96]}
+        args={[lashGeo, undefined, 140]}
       >
         <meshStandardMaterial color="#050608" roughness={0.85} />
       </instancedMesh>
       <instancedMesh
         ref={lowerLashes}
-        args={[lashGeo, undefined, 52]}
+        args={[lashGeo, undefined, 70]}
       >
         <meshStandardMaterial color="#050608" roughness={0.85} />
       </instancedMesh>
       {/* Caruncle: the tear-duct mound rounds off the inner corner.
           Muted mauve — present, not gory. */}
-      <mesh position={[-0.9, -0.01, 0.44]} scale={[1.5, 0.85, 0.7]}>
+      <mesh position={[-0.95, -0.035, 0.4]} scale={[1.5, 0.85, 0.7]}>
         <sphereGeometry args={[0.055, 16, 12]} />
         <meshStandardMaterial color="#43302f" roughness={0.6} />
       </mesh>

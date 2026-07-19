@@ -14,7 +14,7 @@ export default function CameraRig() {
     // Starts close — the eye should dominate the frame like a portrait
     // close-up, not float small in space.
     const push = THREE.MathUtils.smoothstep(p, 0.0, 0.30);
-    const z = THREE.MathUtils.lerp(3.6, 0.86, push);
+    const z = THREE.MathUtils.lerp(3.6, 0.95, push);
 
     // Start slightly off to the side; centre as the push begins so the
     // shot reads as "the eye turns to meet you."
@@ -22,7 +22,7 @@ export default function CameraRig() {
     const offY = THREE.MathUtils.lerp(0.18, 0.0, THREE.MathUtils.smoothstep(p, 0.0, 0.15));
 
     camera.position.set(offX, offY, z);
-    camera.lookAt(0, 0, 0.8);
+    camera.lookAt(0, 0, 0.9);
 
     // Narrowing FOV tightens the frame as we near the pupil.
     camera.fov = THREE.MathUtils.lerp(42, 30, push);
