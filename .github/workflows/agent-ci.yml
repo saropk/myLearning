@@ -1,0 +1,27 @@
+name: auditable-agent-ci
+
+on:
+  push:
+    paths:
+      - "auditable_agent/**"
+      - ".github/workflows/agent-ci.yml"
+  pull_request:
+    paths:
+      - "auditable_agent/**"
+      - ".github/workflows/agent-ci.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # §3 invariant 1: the grep test runs first and gates everything else.
+      - name: Grep test — no networking outside gateway/
+        run: python -m unittest auditable_agent.tests.test_grep_networking -v
+
+      - name: Full test suite
+        run: python -m unittest discover -s auditable_agent/tests -t . -v
