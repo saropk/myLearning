@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.DS_Store
+# Local runtime state — never committed. The DB holds the API token and, from phase 4,
+# every transcript.
+*.db
+*.db-wal
+*.db-shm

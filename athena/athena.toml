@@ -1,0 +1,43 @@
+# Athena user config. Every key here has a built-in default in athena/config.py;
+# this file only overrides. Keys are annotated with the build phase that consumes them.
+
+[daemon]
+host = "127.0.0.1"          # phase 1 — never change this. Security invariant 2.
+port = 8787                 # phase 1
+
+[brain]
+model = "llama3.1:8b"       # phase 1 — the local Ollama brain (~5 GB at q4)
+lite_model = "llama3.2:3b"  # phase 1 — used when brain.lite = true
+lite = false                # phase 1 — the documented escape hatch: less quality, never less availability
+ollama_host = "http://127.0.0.1:11434"  # phase 1 — loopback only, enforced at startup
+keep_alive = "10m"          # phase 1 — Ollama unloads the brain after 10 min of DORMANT
+request_timeout_s = 120.0   # phase 1
+
+[state]
+idle_timeout_s = 120        # phase 1 — ACTIVE auto-returns to DORMANT after this much silence
+follow_up_window_s = 8      # phase 1 — un-named utterances count as directed for this long
+
+# Wake/control phrases. These OVERRIDE nothing: the spec defaults below always work
+# (ATHENA.md, State machine), and anything added here works in addition.
+[state.phrases]
+activate = ["athena, initiate", "athena, it's go time"]
+serious = ["athena, let's get serious", "athena, let's get cracking"]
+unserious = ["good session athena"]
+deactivate = ["that's enough for today athena"]
+voice = ["athena, let's get talking"]
+text = ["athena, let's get handsy"]
+brain_view = ["athena, show me your mind"]
+
+[valve]
+default_level = 1           # phase 1 stores it; phase 5 enforces it. 0=Sealed 1=Questions 2=Redacted 3=Open
+
+[memory]
+# Default: ~/Library/Application Support/Athena/athena.db on macOS (dir chmod 700).
+# db_path = "~/Library/Application Support/Athena/athena.db"
+
+[voice]                     # phase 2 — nothing here is read yet
+push_to_talk = "alt+space"
+whisper_model = "small.en"
+
+[ui]
+open_browser_on_start = false  # phase 1
